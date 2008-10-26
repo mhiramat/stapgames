@@ -1,0 +1,10 @@
+#!/usr/bin/env stap
+# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+
+probe game.input {
+  println($$parms)
+}

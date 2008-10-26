@@ -1,0 +1,38 @@
+#! stap -I ../tapset/
+# systemtap audio sample
+# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+global keytone, keynth
+
+probe begin {
+  // setup keys
+  keytone[44] = "a"; keynth[44] = 2 // z
+  keytone[31] = "a+"; keynth[31] = 2 // s
+  keytone[45] = "b"; keynth[45] = 2 // x
+  keytone[46] = "c"; keynth[46] = 3 // c
+  keytone[33] = "c+"; keynth[33] = 3 // f
+  keytone[47] = "d"; keynth[47] = 3 // v
+  keytone[34] = "d+"; keynth[34] = 3 // g
+  keytone[48] = "e"; keynth[48] = 3 // b
+  keytone[49] = "f"; keynth[49] = 3 // n
+  keytone[36] = "f+"; keynth[36] = 3 // j
+  keytone[50] = "g"; keynth[50] = 3 // m
+  keytone[37] = "g+"; keynth[37] = 3 // k
+  keytone[51] = "a"; keynth[51] = 3 // ,
+  keytone[38] = "a+"; keynth[38] = 3 // l
+  keytone[52] = "b"; keynth[52] = 3 // .
+  keytone[53] = "c"; keynth[53] = 4 // /
+}
+
+probe end {
+  game_nobeep()
+}
+
+probe game.kbd.down {
+  if ([code] in keytone)
+    game_tone(keytone[code], keynth[code], 500)  
+}
+

@@ -1,0 +1,89 @@
+#!/usr/bin/env stap -I ../tapset -DMAXNESTING=200 -DMAXACTION=10000
+# mine sweeper
+# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+
+global MINE=10, X_MAX=10, Y_MAX=10
+global map, vmap
+global cursor
+
+function draw_cursor() {
+  foreach([x,y] in cursor) {
+    cursor_move(x+1,y+1)
+    if (!([x,y] in vmap)) print(" ")
+    else print(vmap[x,y])
+  }
+  delete cursor
+  x = game_mouse_x()/4; y = game_mouse_y()/8
+  if (0 > x) x = 0
+  else if (X_MAX <= x) x = X_MAX -1
+  if (0 > y) y = 0
+  else if (Y_MAX <= y) y = Y_MAX -1
+  cursor[x,y] = vmap[x,y]
+  cursor_move(x+1,y+1)
+  cursor_set_color(7)
+  if (!([x,y] in vmap)) print(" ")
+  else print(vmap[x,y])
+  cursor_reset_color()
+}
+
+probe timer.ms(50) {
+  draw_cursor()
+}
+
+function lookaround(x,y)
+{
+  return map[x-1,y-1] + map[x,y-1] + map[x+1,y-1] +
+         map[x-1,y  ]       +        map[x+1,y  ] +
+         map[x-1,y+1] + map[x,y+1] + map[x+1,y+1]
+}
+
+function update_vmap(x,y)
+{
+  if ((x<0||y<0||x>=X_MAX||y>=Y_MAX) || [x,y] in vmap)
+    return 0
+  vmap[x,y] = lookaround(x,y)
+  cursor_move(x+1,y+1)
+  print(vmap[x,y])
+  if (vmap[x,y] == 0) {
+    update_vmap(x-1,y)
+    update_vmap(x+1,y)
+    update_vmap(x,y-1)
+    update_vmap(x,y+1)
+  }
+}
+
+probe game.mouse.btn {
+  if (button !=0 || down != 0) next
+  foreach([x,y] in cursor) {
+    if (map[x,y] == 1){
+      cursor_move(x+1,y+1)
+      print("*")
+      exit()
+    } else update_vmap(x,y)
+  }
+}
+
+probe begin {
+  game_srand(gettimeofday_ns())
+  i = 0
+  while (i < MINE) {
+    x = game_urand()%X_MAX; y = game_urand()%Y_MAX
+    if ([x,y] in map) continue
+    map[x,y] = 1
+    i++
+  }
+  game_mouse_reset(X_MAX*4/2, Y_MAX*8/2,0)
+  cursor[X_MAX/2, Y_MAX/2] = 0
+  cursor_cls()
+}
+
+probe end {
+  cursor_reset_color()
+  cursor_move(1, Y_MAX+2)
+  println("GAME OVER")
+}
+

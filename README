@@ -1,0 +1,29 @@
+Systemtap Game Collection
+	https://sourceforge.net/projects/stapgames/
+
+Author: Masami Hiramatsu
+
+This project aims to provide small games programmed on systemtap and tapsets 
+which includes useful probes/functions for programming games on systemtap.
+This will give you more fun with systemtap programming.
+
+Contents
+========
+stapgames/
+ +--tapsets/ : Tapset scripts required by game scripts
+ +--games/   : Game scripts
+ +--misc/    : Small test scripts
+
+Usage
+=====
+ You have to specify some options to run these games.
+All scripts require to include tapsets in stapgames/tapset/ directory.
+Some of them also require MAXACTION and MAXNESTING expansion.
+ex)
+$ cd stapgames/
+$ stap games/minesweeper.stp -I tapset/ -DMAXACTION=10000 -DMAXNESTING=100
+
+NOTE
+====
+Beep audio currently works only on 2.6.25 or later kernel.
+
