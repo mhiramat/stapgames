@@ -23,6 +23,13 @@ ex)
 $ cd stapgames/
 $ stap games/minesweeper.stp -I tapset/ -DMAXACTION=10000 -DMAXNESTING=100
 
+Or, use launcher script
+
+$ cd stapgames/
+$ ./launcher ./games/minesweeper.stp
+
+
+
 NOTE
 ====
 Beep audio currently works only on 2.6.25 or later kernel.

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+stap $1 -I ./tapset -DMAXACTION=10000 -DMAXNESTING=200
