@@ -1,4 +1,4 @@
-#! stap -I ../tapset/
+#!/usr/bin/stap -I ../tapset/
 # systemtap audio sample
 # Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #

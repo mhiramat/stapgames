@@ -1,4 +1,4 @@
-#!/usr/bin/env stap -I ../tapset/ -DMAXACTION=10000 -DMAXNESTING=100
+#!/usr/bin/stap -I ../tapset/ -DMAXACTION=10000 -DMAXNESTING=100
 # lifegame
 # Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #
