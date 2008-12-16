@@ -1,0 +1,10 @@
+2008-12-16  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	From Tomoki Sekiyama <tomoki.sekiyama@gmail.com>:
+	tetris.stp: New game
+	tetris_short.stp: New game
+
+2008-12-16  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	minesweeper.stp (update_vmap): expand update area.
+

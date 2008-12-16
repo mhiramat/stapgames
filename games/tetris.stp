@@ -1,0 +1,91 @@
+#!/bin/sh
+# Copyright (C) 2008 Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+
+//usr/bin/stap -v -DMAXACTION=9999 -DMAXSTRINGLEN=999 $0; exit
+global Z,C,P,B,K,t,S,T,h,e
+probe kernel.function("kbd_event") {
+	k = $event_code
+	if ($value) K=k-4?k:K
+}
+
+probe begin {
+	// Create blocks
+	// block is represented by the position from the center.
+	// Every block has "L" part in the center except for a bar.
+	B[0,0] = -11 // non-"L" part for each block
+	B[1,0] = -24
+	B[2,0] = 2
+	B[3,0] = 13
+	B[4,0] = -13
+	B[5,0] = -1
+	B[6,0] = 2
+	for(i=0;i<7;i++){B[i,1]=0;B[i,2]=1;B[i,3]=-12} // common "L" part
+	B[6,3] = -1 // bar is not common
+	// Position: 1 row has 12 columns, and (x,y) is represented by h=x+y*12.
+	h=17 // First block position (center)
+	for(K=t=P=i=0;i<240;){
+		Z[240+i]=Z[i]=++i%12<2||i>228?S="\033[47m  \033[m":T="  "; // Wall and Floor (sentinel)
+	}
+	t=3
+	printf("\033[H\033[2J");
+}
+
+probe timer.ms(99) {
+	printf("\033[H");
+	f=0 // move/rotate flag
+	if(K) // if key is pressed
+		if(K!=103){ // move left or right
+
+			d=K-105?K-106?0:1:-1 // d: movement direction
+			for(i=0;i<4;i++) // check if the block can be moved
+				f+=Z[h+B[t,i]+d]!=T // destination is free
+			f?0:h+=d // move if destinations of every block are free
+
+		}else{ // rotate
+			for(i=0;i<4;i++){ // check if block can be rotated
+				p=B[t,i] // each block position
+				v=(p*2+252)/24-10 // destination x pos(p/12 rounded)
+				w=p-v*12 // destination y pos
+				C[i]=w*12-v // destination position
+
+				if(Z[h+C[i]]!=T)f=1 // check if desetination is free
+			}
+
+			if(t&&!f) for(i=0;i<4;i++) B[t,i]=C[i] // rotate if destinations of every block are free
+		}
+	K=0 // clear the input key
+
+	for(f=i=0;i<4;i++){ // drop 1 row
+		f+=Z[12+(p=h+B[t,i])]!=T // check if destination is free
+		Z[240+p]=S // copy the moving block to display buffer
+	}
+	if(e=!e)
+	if(f){ // the block can't drop anymore
+		for(i=0;i<4;i++)Z[h+B[t,i]]=S // fix the block
+		t=get_cycles()%7 // determin the next block
+		S="\033[4".substr("1234567",t,1)."m  \033[m"
+		h=17 // make the block to initial position
+	}else	h+=12 // drop the block 1 row
+
+	k=1
+	for(i=19;i--;){ // check if line is filled
+
+		for(j=11;--j&&Z[i*12+j]!=T;); // search for filled line
+		if(!j){ // filled!
+			P+=k++ // add a point: 1 line - 1 point, ..., tetris - 10points
+
+			for(j=++i*12;j>2*12;)Z[j]=Z[j---12] // drop every upper block
+		}
+	}
+
+	for(i=0;i<240;i++){
+		printf("%s%s",Z[240+i],i%12-11?"":"\n")
+		Z[240+i]=Z[i] // clear the display buffer
+	}
+	printf("%d\n",P)
+	if(Z[5]!=T)exit() // exit if there are block at initial position
+}
