@@ -1,11 +1,13 @@
 #!/bin/sh
+//usr/bin/env stap -DMAXACTION=9999 -DMAXSTRINGLEN=999 $@ $0; exit $?
+# Tetris
 # Copyright (C) 2008 Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
 #
 # This file is free software and is distributed under the terms of the GNU
 # General Public License (GPL); either version 2, or (at your option) any
 # later version.
 
-//usr/bin/stap -v -DMAXACTION=9999 -DMAXSTRINGLEN=999 $0; exit
+
 global Z,C,P,B,K,t,S,T,h,e
 probe kernel.function("kbd_event") {
 	k = $event_code

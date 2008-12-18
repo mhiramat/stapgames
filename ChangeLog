@@ -1,0 +1,5 @@
+2008-12-17  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	launcher: Removed.
+	README: Add shebang trick and update usage.
+

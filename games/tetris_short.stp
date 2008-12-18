@@ -1,4 +1,5 @@
 #!/bin/sh
+//usr/bin/env stap -DMAXACTION=9999 -DMAXSTRINGLEN=999 $@ $0; exit $?
 # Copyright (C) 2008 Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
 # Inspired by nanagyou(7line)-tetris in JavaScript http://www.geocities.jp/nanagyou/list.html
 #
@@ -6,5 +7,4 @@
 # General Public License (GPL); either version 2, or (at your option) any
 # later version.
 
-//usr/bin/stap -v -DMAXACTION=9999 -DMAXSTRINGLEN=999 $0; exit
 global Z,X,B,A,h,K,t,Q,C,q,c,P,e probe kernel.function("kbd_event"){k=$event_code if ($value) K=k-4?k*2-211:K}probe begin{Z[0]=X[0]=A=12 Q[0]=-7 Q[1]=-20 Q[2]=6 Q[3]=17 Q[4]=-9 Q[5]=3 Q[6]=3}probe timer.ms(99){for(C[0]=q=c=i=4;f=i--*K;c-=!Z[h+(K+5?p+K:C[i]=p*A-(p/9|0)*145)])p=B[i]for(c?0:K+5?h+=K:t?(B[0]=C[0])*(B[1]=C[1])*(B[2]=C[2])*(B[3]=C[3]):0;i=K=q--;f+=Z[A+p])k=X[p=h+B[q]]=1;if(e=!e){h+=A;if(f){h=17 foreach(x in X)Z[x]=X[x]X[0]=l=228 h=17 B[0]=Q[t=get_cycles()%7]-4 B[1]=0 B[2]=1 B[3]=t-6?-A:2 for(;l--;)for(l%A?l-=l%A*!Z[l]:(P+=k++-0*(c=l+=A));--c>A;)Z[c]=Z[c-A]}}for(S="";i<240;S.=X[i]|(X[i]=Z[i]|=++i%A<2|i>228)?i%A?"[]":"[]\n":"  ");printf("\033[H%s%d",S,P);if(Z[5])exit()}

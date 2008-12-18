@@ -1,4 +1,5 @@
-#!/usr/bin/stap -I ../tapset -DMAXNESTING=200 -DMAXACTION=10000
+#!/bin/sh
+//usr/bin/env stap -I `dirname $0`../tapset/ -DMAXACTION=10000 -DMAXNESTING=200 $@ $0;exit $?
 # mine sweeper
 # Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #
