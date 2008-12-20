@@ -1,18 +1,22 @@
+2008-12-19  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	* 15game.stp: New game
+
 2008-12-17  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
-	lifegame.stp: Shebang hacking.
-	minesweeper.stp: Ditto.
-	piano.stp: Ditto.
-	tetris.stp: Ditto.
-	tetris_short.stp: Ditto.
+	* lifegame.stp: Shebang hacking.
+	* minesweeper.stp: Ditto.
+	* piano.stp: Ditto.
+	* tetris.stp: Ditto.
+	* tetris_short.stp: Ditto.
 
 2008-12-16  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
 	From Tomoki Sekiyama <tomoki.sekiyama@gmail.com>:
-	tetris.stp: New game
-	tetris_short.stp: New game
+	* tetris.stp: New game
+	* tetris_short.stp: New game
 
 2008-12-16  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
-	minesweeper.stp (update_vmap): expand update area.
+	* minesweeper.stp (update_vmap): expand update area.
 
