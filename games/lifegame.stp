@@ -1,5 +1,5 @@
 #!/bin/sh
-//usr/bin/env stap -I `dirname $0`../tapset/ -DMAXACTION=10000 -DMAXNESTING=100 $@ $0;exit $?
+//usr/bin/env stap -I `dirname $0`/../tapset/ -DMAXACTION=10000 -DMAXNESTING=100 $@ $0;exit $?
 # lifegame
 # Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #

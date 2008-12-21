@@ -1,3 +1,11 @@
+2008-12-21  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	* inputtest.stp: Fix -I option.
+	* keyboardtest.stp: Ditto.
+	* mousetest.stp: Ditto.
+
 2008-12-18  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
-	* *.stp: Shebang hacking.
+	* inputtest.stp: Shebang hacking.
+	* keyboardtest.stp: Ditto.
+	* mousetest.stp: Ditto.

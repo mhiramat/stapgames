@@ -1,5 +1,5 @@
 #!/bin/sh
-//usr/bin/env stap -I `dirname $0`../tapset/ $@ $0; exit $?
+//usr/bin/env stap -I `dirname $0`/../tapset/ $@ $0; exit $?
 # systemtap audio sample
 # Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #
