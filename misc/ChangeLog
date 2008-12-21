@@ -1,5 +1,9 @@
 2008-12-21  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
+	* template.stp: Add game script template
+
+2008-12-21  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
 	* inputtest.stp: Fix -I option.
 	* keyboardtest.stp: Ditto.
 	* mousetest.stp: Ditto.

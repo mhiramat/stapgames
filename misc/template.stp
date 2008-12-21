@@ -1,0 +1,11 @@
+#!/bin/sh
+//usr/bin/env stap -I`dirname $0`/../tapset $@ $0; exit $? 
+# game template
+# Copyright (C) 200* *Author* <*email*>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+
+# Program your idea here.
+
