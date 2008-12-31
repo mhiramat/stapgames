@@ -1,0 +1,171 @@
+#!/bin/sh
+//usr/bin/env stap -I`dirname $0`/../tapset $@ $0; exit $? 
+# shooting game 1
+# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+
+#TODO:
+# - more enemies(T, U ...)
+# - special UFO (<O>)
+# - more stages
+
+global enemy, missile, beam, beams
+global SHIPLINE=20, MAXX=50, ENEMYLINE=4
+global ex=0, ey=0, edx=1
+global ship=19, sship, dship, shot, nship=2
+global score=0, bang=0
+
+function bang_ship() {
+  cursor_move(ship,SHIPLINE); print(">*<")
+  bang=1
+  if (nship == 0) 
+    exit()
+  else {
+    nship--
+    show_scores()
+  }
+}
+
+probe timer.s(1) if(bang) {
+  bang = 0
+}
+
+function hit_enemy(x,y) {
+  if ([x-ex,y-ey] in enemy) {
+    cursor_move(x,y); print("*")
+    delete enemy[x-ex,y-ey]
+    delete beam[x]
+    beams--
+    score ++
+    show_scores()
+    return 1
+  }
+  return 0
+}
+
+function move_missile() {
+  for(x=1; x<MAXX; x++) {
+    if (!([x] in missile)) continue
+    y = missile[x]++
+    cursor_move(x,y); print(" ")
+    if (y == SHIPLINE) {
+      delete missile[x]
+      continue
+    }
+    y++
+    cursor_move(x,y); print(":")
+    if (y == SHIPLINE && x >= ship && x < ship+3)
+      bang_ship()
+  }
+}
+
+function move_beam() {
+  for(x=1; x<MAXX; x++) {
+    if (!([x] in beam)) continue
+    y = beam[x]--
+    cursor_move(x,y); print(" ")
+    if (y == 2) {
+      delete beam[x]
+      beams--
+      continue
+    }
+    y--
+    if (!hit_enemy(x,y)) {
+      cursor_move(x,y); print("|")
+    }
+  }
+}
+
+function move_enemy() {
+  oex=ex; oey=ey
+  ex += edx
+  if (ex == 1) {edx = 1; ey++}
+  if (ex == 10) edx = -1
+  if (ey+ENEMYLINE == SHIPLINE)
+    exit()
+  foreach([x,y] in enemy) {
+    s = enemy[x,y]
+    cursor_move(x+oex,y+oey); print(" ")
+    cursor_move(x+ex,y+ey); print(s)
+    if(game_urand()%30 == 19 && !([x+ex] in missile)) {
+      missile[x+ex]=ENEMYLINE+ey
+      cursor_move(x+ex,ENEMYLINE+ey); print(":")
+    }
+  }
+}
+
+function move_ship() {
+  cursor_move(ship, SHIPLINE); print("   ")
+  if (ship==1 || ship == 50 - 3)
+    dship=0
+  else
+    ship += dship
+  if (sship) {
+    sship=0
+    dship=0
+  }
+  if (shot && beams < 5) {
+    shot = 0
+    beams++
+    if (!([ship+1] in beam)) {
+      beam[ship+1]=SHIPLINE-1
+      cursor_move(ship+1,SHIPLINE-1); print("|")
+    }
+  }
+  cursor_move(ship, SHIPLINE); print("oAo")
+}
+
+probe game.kbd {
+  if (down) {
+    if (code == GM_KBD_RIGHT)
+      dship = 1
+    else if (code == GM_KBD_LEFT)
+      dship = -1
+    else if (code == GM_KBD_SPACE)
+      shot = 1
+  } else if (code == GM_KBD_RIGHT || code == GM_KBD_LEFT)
+    sship = 1
+}
+
+probe begin {
+  game_srand(gettimeofday_us())
+  for (x=1; x<40; x+=2)
+    enemy[x, 1] = "M"
+  for (x=1; x<40; x+=2)
+    enemy[x, 2] = "W"
+  for (x=1; x<40; x+=2)
+    enemy[x, 3] = "Y"
+  cursor_cls()
+  move_enemy()
+  move_ship()
+  show_scores()
+}
+
+function show_scores() {
+  cursor_move(1,1); printf("SCORE:%03d00  oAo x %d", score, nship)
+}
+
+probe timer.ms(100) {
+  move_beam()
+  move_missile()
+  cursor_move(50,1)
+}
+
+probe timer.ms(200) if (!bang) {
+  move_ship()
+  cursor_move(50,1)
+}
+
+probe timer.ms(800) {
+  move_enemy()
+  cursor_move(50,1)
+}
+
+probe end {
+  cursor_move(16,10); print("-GAME OVER-")
+  cursor_move(1,21)
+}
+

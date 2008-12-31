@@ -1,0 +1,99 @@
+#!/bin/sh
+//usr/bin/env stap -I`dirname $0`/../tapset $@ $0; exit $? 
+# driving game
+# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+#
+# This file is free software and is distributed under the terms of the GNU
+# General Public License (GPL); either version 2, or (at your option) any
+# later version.
+
+# TODO
+# - score(run meter)
+# - velocity support
+# - items, oils, other cars
+# - sophisticated road generation or map support
+
+global car, width, bias, run, vel, len, dcar, scar
+
+function show_road() {
+  for (i=0;i<25;i++) {
+    w=width[(run+i)%40]
+    b=bias[(run+i)%40]
+    cursor_move(b,25-i); print("@")
+    cursor_move(b+w,25-i); print("@")
+  }
+}
+
+function check_car() {
+  w=width[(run+4)%40] # 25-21=4
+  b=bias[(run+4)%40]
+  if (b > car+1  || w+b < car+1) {
+    cursor_move(car,21); print(">*< BANG!")
+    exit()
+  }
+}
+
+function show_car() {
+  cursor_move(car,20); print("0T0")
+  cursor_move(car,21); print(" U ")
+  cursor_move(car,22); print("0=0")
+}
+
+function gen_road() {
+  l=game_urand()%10+5
+  s=30-l
+  b=(game_urand()%s)+(2+l)
+  s=35-l
+  w=(game_urand()%s)+(5+l)
+  ow=width[(run+24)%40]
+  ob=bias[(run+24)%40]
+  for (i=1;i<=l;i++) {
+    width[(run+24+i)%40] = ow + (w - ow)*i/l
+    bias[(run+24+i)%40] = ob + (b - ob)*i/l
+  }
+  len += l
+}
+
+probe begin {
+  game_srand(gettimeofday_us())
+  for (i=0;i<25;i++) {
+    width[i]=40
+    bias[i]=2
+  }
+  len = 0
+  gen_road()
+  run=0
+  vel=1
+  car=21
+  cursor_cls()
+}
+
+probe timer.ms(100) {
+  cursor_cls()
+  run += vel
+  if (run >= len)
+    gen_road()
+  show_road()
+  car += dcar
+  if (scar) {
+    scar = 0
+    dcar = 0
+  }
+  show_car()
+  check_car()
+}
+
+probe game.kbd {
+  if (down) {
+    if (code == GM_KBD_RIGHT)
+       dcar = 1
+    else if (code == GM_KBD_LEFT)
+       dcar = -1
+  } else if (code == GM_KBD_LEFT || code == GM_KBD_RIGHT)
+    scar = 1
+}
+
+probe end {
+  cursor_move(14,10); print("-GAME OVER-")
+  cursor_move(1,25)
+}

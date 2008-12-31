@@ -1,3 +1,9 @@
+2008-12-30  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	* driving.stp: New game
+	* shooting.stp: New game
+	* block.stp: New game
+
 2008-12-21  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
 	* lifegame.stp: Fix -I option.
