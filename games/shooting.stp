@@ -99,10 +99,13 @@ function move_enemy() {
 
 function move_ship() {
   cursor_move(ship, SHIPLINE); print("   ")
-  if (ship==1 || ship == 50 - 3)
-    dship=0
-  else
-    ship += dship
+  ship += dship
+
+  if (ship < 1)
+    ship=1
+  else if (ship > 50 - 3)
+    ship = 50 - 3
+
   if (sship) {
     sship=0
     dship=0
