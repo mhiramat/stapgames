@@ -20,7 +20,7 @@ function game_tty_init:long ()
 	return tty
 }
 
-probe begin {
+probe begin(-100) {
 	if (game_tty_init() == 0) {
 		print("Failed to get current tty\n")
 		exit()
