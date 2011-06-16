@@ -1,5 +1,5 @@
 # systemtap input tapset
-# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+# Copyright (C) 2008,2011 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #
 # This file is free software and is distributed under the terms of the GNU
 # General Public License (GPL); either version 2, or (at your option) any
@@ -54,16 +54,30 @@ probe game.mouse.rel = game.input {
 }
 
 global GM_mouse_abs
+global GM_mouse_base_x, GM_mouse_base_y
 
 probe game.mouse.abs = game.input {
-  if(type != 3) next #EV_ABS
-  if(code == 0) {
+  dx = dy = dz = 0
+  if (type == 1 && code == 0x145 && value == 0) {
+    # Leave a finger -- Reset position
+    GM_mouse_base_x = 0
+    GM_mouse_base_y = 0
+    next
+  } else if (type != 3) next #EV_ABS
+
+  if (code == 0) {
+     x = value
+     if (GM_mouse_base_x != 0)
+       dx = x - GM_mouse_base_x
+     GM_mouse_base_x = x
      GM_mouse_abs[0] = value
-  } else if(code == 1) {
+  } else if (code == 1) {
+     y = value
+     if (GM_mouse_base_y != 0)
+       dy = y - GM_mouse_base_y
+     GM_mouse_base_y = y
      GM_mouse_abs[1] = value
   }
-  x = GM_mouse_abs[0]
-  y = GM_mouse_abs[1]
 }
 
 global GM_mouse_btn
@@ -78,39 +92,16 @@ probe game.mouse.btn = game.input {
 
 global GM_mouse_pos
 
-probe game.mouse.rel {
+probe game.mouse.rel, game.mouse.abs {
   GM_mouse_pos[0] += dx
   GM_mouse_pos[1] += dy
   GM_mouse_pos[2] += dz
 }
 
-/*
-global GM_mouse_base, __GM_reset
-# we don't use that because ABS touchpad is very unstable
-probe game.mouse.abs {
-  if (code == 0) { # x abs
-    if ([0] in __GM_reset) {
-      GM_mouse_base[0] = value - __GM_reset[0]
-      delete __GM_reset[0]
-    }
-    GM_mouse_pos[0] = value - GM_mouse_base[0]
-  } else
-  if (code == 1) { # y abs
-    if ([1] in __GM_reset) {
-      GM_mouse_base[1] = value - __GM_reset[1]
-      delete __GM_reset[1]
-    }
-    GM_mouse_pos[1] = value - GM_mouse_base[1]
-  }
-}
-*/
-
 function game_mouse_reset(x:long, y:long, z:long) {
   GM_mouse_pos[0] = x
   GM_mouse_pos[1] = y
   GM_mouse_pos[2] = z
-//  __GM_reset[0] = x
-//  __GM_reset[1] = y
 }
 
 function game_mouse_x:long() {

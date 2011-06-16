@@ -1,3 +1,8 @@
+2011-06-16  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	* tapset/gmtty.stp: Add for getting tty window size
+	* tapset/input.stp: Support absolute pointing device (e.g. touchpad)
+
 2008-12-17  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
 	launcher: Removed.

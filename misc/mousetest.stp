@@ -1,7 +1,7 @@
 #!/bin/sh
 //usr/bin/env stap -I `dirname $0`/../tapset/ $@ $0;exit $?
 # mouse input test
-# Copyright (C) 2008 Masami Hiramatsu <masami.hiramatsu@gmail.com>
+# Copyright (C) 2008,2011 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #
 # This file is free software and is distributed under the terms of the GNU
 # General Public License (GPL); either version 2, or (at your option) any
@@ -13,16 +13,24 @@ probe begin {
 }
 
 probe game.mouse.btn {
-#probe game.input {
-#  if (type != 1) next
   cursor_move(1,1)
   printf("button %03x %s\n", button, down?"down":" up ")
   #printf("button %03x %s\n", code, value?"down":" up ")
 }
 
 probe timer.ms(10) {
-#  cursor_cls()
-  cursor_move(game_mouse_x()/5, game_mouse_y()/10)
+  cursor_cls()
+  x = game_mouse_x()/5
+  y = game_mouse_y()/10
+  if (x > game_tty_ws_col())
+    x = game_tty_ws_col()
+  else if (x < 0)
+    x = 0
+  if (y > game_tty_ws_row())
+    y = game_tty_ws_row()
+  else if (y < 0)
+    y = 0
+  cursor_move(x,y)
   print("@")
 }
 
