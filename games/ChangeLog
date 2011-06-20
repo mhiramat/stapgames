@@ -1,3 +1,7 @@
+2011-06-21  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
+
+	* sl: Support -F option
+
 2011-06-17  Masami Hiramatsu  <masami.hiramatsu@gmail.com>
 
 	* sl: New ..game?

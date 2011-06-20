@@ -1,14 +1,17 @@
-#!/bin/sh
-//usr/bin/env stap -I`dirname $0`/../tapset $@ $0; exit $? 
+#!/bin/bash
+//bin/true; function strun() { /usr/bin/env stap $*; }
+//bin/true; OPT=""; SOPT=""; sc=$0
+//bin/true; while [ "$1" ]; do case "$1" in "-F") OPT="fly";shift;; *) SOPT=$SOPT" $1";shift;;esac; done
+//bin/true; strun -I`dirname $sc`/../tapset $SOPT $sc $OPT; exit $? 
 # SL -- run a steam locomotion in terminal
 # Copyright (C) 2011 Masami Hiramatsu <masami.hiramatsu@gmail.com>
 #
 # This file is free software and is distributed under the terms of the GNU
 # General Public License (GPL); either version 2, or (at your option) any
 # later version.
-
 global pos_x, pos_y
 global sl[5], slen
+global d_y=0
 
 probe begin {
 	sl[0] = "     *o*o*o*o       "
@@ -18,14 +21,18 @@ probe begin {
 	sl[4] = "/|OO==OO=OO   O   O "
 	slen = strlen(sl[0])
 
-	pos_x = game_tty_ws_col() + slen
+	pos_x = game_tty_ws_col()
 	pos_y = game_tty_ws_row() / 2 - 3
+	foreach ([i] in argv) if (argv[i] == "fly") {
+		d_y = -1
+		pos_y = game_tty_ws_row()
+	}
 }
 
 probe timer.ms(60) {
 	col = game_tty_ws_col()
 	row = game_tty_ws_row()
-	if (pos_y + 5 > row) pos_y = row - 5
+	if (d_y == 0 && pos_y + 5 > row) pos_y = row - 5
 
 	x = (pos_x >= 1) ? pos_x : 1
 	s = x - pos_x;
@@ -33,11 +40,13 @@ probe timer.ms(60) {
 
 	ansi_clear_screen()
 	foreach (i in sl) {
+		if (pos_y + i > row || pos_y + i < 1) continue;
 		ansi_cursor_move(x, pos_y + i)
 		print(substr(sl[i], s, e - s))
 	}
-	pos_x --;
-	if (pos_x < -slen)
+	if (pos_x % 3 == 0)pos_y += d_y
+	pos_x --
+	if (pos_x < -slen || pos_y + 5 < 0)
 		exit()
 }
 
